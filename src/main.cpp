@@ -1,7 +1,9 @@
 #include <exception>
-#include <vector>
-#include <string>
+#include <fstream>
 #include <iostream>
+#include <queue>
+#include <string>
+#include <vector>
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -127,5 +129,142 @@ struct Node {
         }
         val += "}";
         return val;
+    }
+};
+
+struct Maze {
+    static std::vector<Node*>* A_Star(Node* start, Node* goal) {
+        auto* openList = new std::priority_queue<Node*>;
+        auto* closedList = new std::vector<Node*>;
+
+        for (Node* node : *Node::getNodes()){
+            node->setGCost(2147483647);
+            node->setHCost(0);
+            node->setFCost(node->getGCost() + node->getHCost());
+        }
+
+        openList->push(start);
+
+        start->setGCost(0);
+        start->setHCost(heuristic(start, goal));
+        start->setFCost(start->getGCost() + start->getHCost());
+
+        while (!openList->empty()) {
+            Node* current_node = openList->top();
+            openList->pop();
+
+            if (current_node == goal){
+                return reconstruct_path(start, goal);
+            }
+
+            closedList->push_back(current_node);
+            Node::printNodes(current_node->getAdjacentNodes());
+
+            for (Node* neighbor: *current_node->getAdjacentNodes()) {
+                bool neighborIsNode = false;
+                for (Node *node: *closedList) {
+                    if (neighbor == node) {
+                        neighborIsNode = true;
+                        break;
+                    }
+                }
+
+                if (neighborIsNode) {
+                    continue;
+                }
+
+                int tentative_g_cost = current_node->getGCost() + 1;
+
+                auto tempqueue = *openList;
+                while (!tempqueue.empty()) {
+                    if (tempqueue.top() != neighbor) {
+                        tempqueue.pop();
+                    }
+                }
+
+                if (tempqueue.empty()) {
+                    openList->push(neighbor);
+                }
+
+                if (tentative_g_cost >= neighbor->getGCost()){
+                    continue;
+                }
+
+                neighbor->setParent(current_node);
+                neighbor->setGCost(tentative_g_cost);
+                neighbor->setHCost(heuristic(neighbor, goal));
+                neighbor->setFCost(neighbor->getGCost() + neighbor->getHCost());
+            }
+        }
+
+        if (openList->empty()) {
+            return nullptr;
+        }
+    }
+
+    static std::vector<Node*>* reconstruct_path(Node* start, Node* goal) {
+        auto* revPath = new std::vector<Node*> {};
+        Node* currentNode = goal;
+        while(currentNode!=start){
+            revPath->emplace_back(currentNode);
+            currentNode = currentNode->getParent();
+        }
+        revPath->emplace_back(start);
+
+        auto* path = new std::vector<Node*> {};
+
+        for(int i = revPath->size()-1; i > -1; i--){
+            path->emplace_back(revPath->at(i));
+        }
+
+        return path;
+    }
+
+    static int heuristic(Node* start, Node* goal) {
+        return 0;
+    }
+
+    static void ingestNodesFromFile(std::string filePath) {
+        std::string line;
+        std::ifstream file;
+        file.open(filePath);
+        if (file.is_open()) {
+            while (getline(file, line)) {
+                std::vector<std::string> splitLine = splitString(line, ' ');
+                if (splitLine.size() == 0) {
+                    continue;
+                }
+
+                if(Node::getNode(std::stoi(splitLine.at(0))) == nullptr){
+                    new Node(std::stoi(splitLine.at(0)));
+                }
+
+                for(int i = 1; i < splitLine.size() && std::stoi(splitLine.at(i)) != -1; i++){
+                    Node::getNode(std::stoi(splitLine.at(0)))->addAdjacentByValue(std::stoi(splitLine.at(i)));
+                }
+            }
+        }
+    }
+
+    static std::vector<std::string> splitString(std::string str, char dl) {
+        std::string word;
+        int num = 0;
+
+        str = str + dl;
+        int l = str.size();
+
+        std::vector<std::string> substr_list;
+        for (int i = 0; i < l; i++) {
+            if (str[i] != dl) {
+                word = word + str[i];
+            } else {
+                if ((int)word.size() != 0) {
+                    substr_list.push_back(word);
+                }
+                word = "";
+            }
+        }
+        
+        return substr_list;
     }
 };
