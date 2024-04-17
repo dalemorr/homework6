@@ -266,14 +266,15 @@ struct Maze {
 };
 
 int main() {
-    std::string File = "data/maze.txt";
+    std::string file_name;
+    // maze.txt
+    file_name = "data/maze.txt";
 
-    Maze::ingestNodesFromFile(File);
+    Maze::ingestNodesFromFile(file_name);
     std::vector<Node*>* path = Maze::A_Star(Node::getNode(1), Node::getNode(100));
 
-    std::cout << "File: " << File << std::endl;
-    std::cout << "Path:" << std::endl;
-
+    std::cout << "File: " << file_name << std::endl;
+    std::cout << "Path: ";
     for (int i = 0; i < path->size(); i++) {
         std::cout << path->at(i)->getValue();
         if(i != path->size()-1) {
@@ -281,58 +282,50 @@ int main() {
         }
     }
     std::cout << std::endl;
-
     std::cout << "Path Cost: " << path->at(path->size()-1)->getFCost() << std::endl;
 
     Node::clearNodes();
 
-    //test-maze
+    // test-maze.txt
+    std::cout << std::endl;
 
-    Node::clearNodes();
+    file_name = "data/test-maze.txt";
 
-    std::string File2 = "data/test-maze.txt";
-
-    Maze::ingestNodesFromFile(File2);
+    Maze::ingestNodesFromFile(file_name);
 
     std::vector<Node*>* path2 = Maze::A_Star(Node::getNode(1), Node::getNode(6));
 
-    std::cout << "\nFile:";
-
-    std::cout << "\n" <<  File2 << ":\n";
-
-    std::cout << "Path:\n";
-
-    for(int i = 0; i < path2->size(); i++){
+    std::cout << "File: " << file_name << std::endl;
+    std::cout << "Path: ";
+    for (int i = 0; i < path2->size(); i++) {
         std::cout << path2->at(i)->getValue();
-        if(i != path2->size()-1)
+        if (i != path2->size()-1) {
             std::cout << "->";
+        }
     }
-    std::cout << "\nPath Cost: " << path2->at(path2->size()-1)->getFCost();
-
-    std::cout << '\n';
-
-    // test-maze2
+    std::cout << std::endl;
+    std::cout << "Path Cost: " << path2->at(path2->size()-1)->getFCost() << std::endl;
 
     Node::clearNodes();
 
-    std::string File3 = "data/test-maze2.txt";
+    // test-maze2.txt
+    std::cout << std::endl;
+    file_name = "data/test-maze2.txt";
 
-    Maze::ingestNodesFromFile(File3);
+    Maze::ingestNodesFromFile(file_name);
 
     std::vector<Node*>* path3 = Maze::A_Star(Node::getNode(1), Node::getNode(7));
 
-    std::cout << "\nFile:";
-
-    std::cout << "\n" << File3 << ":\n";
-
-    std::cout << "Path:\n";
-
-    for(int i = 0; i < path3->size(); i++){
+    std::cout << "File: " << file_name << std::endl;
+    std::cout << "Path: ";
+    for (int i = 0; i < path3->size(); i++) {
         std::cout << path3->at(i)->getValue();
-        if(i != path3->size()-1)
+        if (i != path3->size()-1) {
             std::cout << "->";
+        }
     }
-    std::cout << "\nPath Cost: " << path3->at(path3->size()-1)->getFCost();
+    std::cout << std::endl;
+    std::cout << "Path Cost: " << path3->at(path3->size()-1)->getFCost() << std::endl;
 
-    std::cout << '\n';
+    Node::clearNodes();
 }
